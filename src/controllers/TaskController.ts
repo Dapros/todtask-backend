@@ -9,8 +9,8 @@ export class TaskController {
       const task = new Task(req.body)
       task.project = req.project.id // asignar a project de task, el valor que tiene project.id
       req.project.tasks.push(task.id) // asignar task de project al arreglo para que almacene las id de las tareas
-      await task.save()
-      await req.project.save()
+      // se ejecuta si todos los promps se cumplen
+      await Promise.allSettled([task.save(), req.project.save()]) // se encarga de que se ejecuten ambos
       res.send('Tarea creada correctamente :D')
     } catch (error) {
       console.log(error)
