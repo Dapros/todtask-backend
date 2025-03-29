@@ -33,6 +33,8 @@ export class ProjectController {
     const { id } = req.params
     try {
       const project = await Project.findById(id) // permite traer un registro por findById
+        .populate('tasks') // para traer toda la info de tasks desde proyecto por Id
+      
       //sino existe el ID
       if(!project){
         const error = new Error('Proyecto no encontrado')

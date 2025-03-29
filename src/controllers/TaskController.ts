@@ -13,7 +13,17 @@ export class TaskController {
       await Promise.allSettled([task.save(), req.project.save()]) // se encarga de que se ejecuten ambos
       res.send('Tarea creada correctamente :D')
     } catch (error) {
-      console.log(error)
+      res.status(500).json({error: 'Hubo un error :c'})
+    }
+  }
+
+  static getProjectTasks = async (req: Request, res: Response) => {
+    try {
+      const tasks = await Task.find({project: req.project.id}) // como decir WHERE project.id
+        .populate('project') // traemos toda la informacion con populate
+      res.json(tasks)
+    } catch (error) {
+      res.status(500).json({error: 'Hubo un error :c'})
     }
   }
 }

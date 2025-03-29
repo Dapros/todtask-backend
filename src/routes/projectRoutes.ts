@@ -59,7 +59,7 @@ router.delete('/:id',
 
 /** Rutas de las tareas - se hacen aqui porque dependen del proyecto */
 
-
+// POST - Crear tareas
 router.post('/:projectId/tasks',
   // validacion de que el proyecto exista
   validateProjectExists,
@@ -72,6 +72,12 @@ router.post('/:projectId/tasks',
     .withMessage('La descripcion de la tarea es obligatoria'),
   handleInputErrors,
   TaskController.createTask
+)
+
+// GET - Traer tasks
+router.get('/:projectId/tasks', 
+  validateProjectExists,
+  TaskController.getProjectTasks
 )
 
 export default router
