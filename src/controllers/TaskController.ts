@@ -52,4 +52,50 @@ export class TaskController {
     }
   }
 
+  static updateTask = async (req: Request, res: Response) => {
+    try {
+      const { taskId } = req.params // extrae taskId de los parametros del reques desde routes
+      const task = await Task.findById(taskId)
+      if(!task){ // sino existe lanza error y un status 404
+        const error = new Error('Tarea no encontrada')
+        res.status(404).json({error: error.message})
+        return
+      }
+      // si la tarea no pertenece a un proyecto
+      if(task.project.toString() !== req.project.id){
+        const error = new Error('Accion no valida')
+        res.status(400).json({error: error.message})
+        return
+      }
+
+      task.name = req.body.name
+      task.description = req.body.description
+      await task.save()
+
+      res.send('Tarea Actualizada Correctamente :D') 
+    } catch (error) {
+      res.status(500).json({error: 'Hubo un error :c'})
+    }
+  }
+
+  static deleteTask = async (req: Request, res: Response) => {
+    try {
+      const { taskId } = req.params // extrae taskId de los parametros del reques desde routes
+      const task = await Task.findById(taskId, req.body)
+      if(!task){ // sino existe lanza error y un status 404
+        const error = new Error('Tarea no encontrada')
+        res.status(404).json({error: error.message})
+        return
+      }
+      req.project.tasks = req.project.tasks.filter(task => task.toString() !== taskId) // filtrara lo que tiene el arreglo de project.task menos el taskId, es decir lo va a limpiar de la lista
+
+      // await task.deleteOne() // luego de encontrar id y pasar las validaciones lo eliminara con deleteOne
+      // await req.project.save()
+      await Promise.allSettled([task.deleteOne(), req.project.save()]) // para evitar doble await
+
+      res.send('Tarea ELIMINADA! Correctamente :D') 
+    } catch (error) {
+      res.status(500).json({error: 'Hubo un error :c'})
+    }
+  }
 }

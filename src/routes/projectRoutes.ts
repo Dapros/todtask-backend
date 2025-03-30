@@ -59,10 +59,12 @@ router.delete('/:id',
 
 /** Rutas de las tareas - se hacen aqui porque dependen del proyecto */
 
+router.param('projectId', validateProjectExists) //parametros del router - donde encuentre el parametro projectId, se ejecutara la funcion validateProjectExists, antes que se genere cada router y evitar colocar el mismo middleware en todos los routes, se define como predefinido por asi decirlo
+
 // POST - Crear tareas
 router.post('/:projectId/tasks',
   // validacion de que el proyecto exista
-  validateProjectExists,
+  // validateProjectExists,
   // agregar validaciones
   body('name')
     .notEmpty()
@@ -75,15 +77,39 @@ router.post('/:projectId/tasks',
 )
 
 // GET - Traer tasks
-router.get('/:projectId/tasks', 
-  validateProjectExists,
+router.get('/:projectId/tasks',
   TaskController.getProjectTasks
 )
 
 // GET - Traer task unica por id
-router.get('/:projectId/tasks/:taskId', 
-  validateProjectExists,
+router.get('/:projectId/tasks/:taskId',
+  // validar que el taskId existe
+  param('taskId').isMongoId().withMessage('ID no valido'),
+  handleInputErrors,
   TaskController.getTaskById
+)
+
+// PUT - Actualizar task por id
+router.put('/:projectId/tasks/:taskId',
+  // validar que el taskId existe
+  param('taskId').isMongoId().withMessage('ID no valido'),
+  // validar que name y description no esten vacios, para actualizar es necesario agregar
+  body('name')
+    .notEmpty()
+    .withMessage('El nombre de la tarea es Obligatorio'),
+  body('description')
+    .notEmpty()
+    .withMessage('La descripcion de la tarea es obligatoria'),
+  handleInputErrors,
+  TaskController.updateTask
+)
+
+// DELETE - Borrar task por id
+router.delete('/:projectId/tasks/:taskId',
+  // validar que el taskId existe
+  param('taskId').isMongoId().withMessage('ID no valido'),
+  handleInputErrors,
+  TaskController.deleteTask
 )
 
 export default router
