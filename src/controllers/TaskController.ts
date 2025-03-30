@@ -26,4 +26,30 @@ export class TaskController {
       res.status(500).json({error: 'Hubo un error :c'})
     }
   }
+
+  static getTaskById = async (req: Request, res: Response) => {
+    try {
+      const { taskId } = req.params // extrae taskId de los parametros del reques desde routes
+      const task = await Task.findById(taskId) // si encuentra por Id el mismo del parametro lo almacena en task
+      if(!task){ // sino existe lanza error y un status 404
+        const error = new Error('Tarea no encontrada')
+        res.status(404).json({error: error.message})
+        return
+      }
+
+      // console.log(task.project.toString()) // muestra el id como objectId - se transforma a string con toString
+      // console.log(req.project.id)
+
+      // si la tarea no pertenece a un proyecto
+      if(task.project.toString() !== req.project.id){
+        const error = new Error('Accion no valida')
+        res.status(400).json({error: error.message})
+        return
+      }
+      res.json(task) // si existe lo devuelve como json
+    } catch (error) {
+      res.status(500).json({error: 'Hubo un error :c'})
+    }
+  }
+
 }

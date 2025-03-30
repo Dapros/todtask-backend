@@ -80,4 +80,10 @@ router.get('/:projectId/tasks',
   TaskController.getProjectTasks
 )
 
+// GET - Traer task unica por id
+router.get('/:projectId/tasks/:taskId', 
+  validateProjectExists,
+  TaskController.getTaskById
+)
+
 export default router
