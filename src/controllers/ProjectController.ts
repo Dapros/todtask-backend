@@ -51,7 +51,7 @@ export class ProjectController {
   static updateProject = async (req: Request, res: Response) => {
     const { id } = req.params
     try {
-      const project = await Project.findByIdAndUpdate(id, req.body) // encontrar registro por id y como segundo parametro el request.body y lo actualizara
+      const project = await Project.findById(id) // encontrar registro por id y como segundo parametro el request.body y lo actualizara
 
       //sino existe
       if(!project){
@@ -59,6 +59,10 @@ export class ProjectController {
         res.status(404).json({error: error.message})
         return 
       }
+      
+      project.clientName = req.body.clientName
+      project.projectName = req.body.projectName
+      project.description = req.body.description
 
       await project.save()
       res.send('Proyecto Actualizado :D')

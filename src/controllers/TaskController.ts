@@ -29,15 +29,6 @@ export class TaskController {
 
   static getTaskById = async (req: Request, res: Response) => {
     try {
-      // console.log(task.project.toString()) // muestra el id como objectId - se transforma a string con toString
-      // console.log(req.project.id)
-
-      // si la tarea no pertenece a un proyecto
-      if(req.task.project.toString() !== req.project.id){
-        const error = new Error('Accion no valida')
-        res.status(400).json({error: error.message})
-        return
-      }
       res.json(req.task) // si existe lo devuelve como json
     } catch (error) {
       res.status(500).json({error: 'Hubo un error :c'})
@@ -46,17 +37,9 @@ export class TaskController {
 
   static updateTask = async (req: Request, res: Response) => {
     try {
-      // si la tarea no pertenece a un proyecto
-      if(req.task.project.toString() !== req.project.id){
-        const error = new Error('Accion no valida')
-        res.status(400).json({error: error.message})
-        return
-      }
-
       req.task.name = req.body.name
       req.task.description = req.body.description
       await req.task.save()
-
       res.send('Tarea Actualizada Correctamente :D') 
     } catch (error) {
       res.status(500).json({error: 'Hubo un error :c'})
