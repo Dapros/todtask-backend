@@ -81,7 +81,7 @@ export class TaskController {
   static deleteTask = async (req: Request, res: Response) => {
     try {
       const { taskId } = req.params // extrae taskId de los parametros del reques desde routes
-      const task = await Task.findById(taskId, req.body)
+      const task = await Task.findById(taskId)
       if(!task){ // sino existe lanza error y un status 404
         const error = new Error('Tarea no encontrada')
         res.status(404).json({error: error.message})
@@ -94,6 +94,24 @@ export class TaskController {
       await Promise.allSettled([task.deleteOne(), req.project.save()]) // para evitar doble await
 
       res.send('Tarea ELIMINADA! Correctamente :D') 
+    } catch (error) {
+      res.status(500).json({error: 'Hubo un error :c'})
+    }
+  }
+
+  static updateStatus = async (req: Request, res: Response) => {
+    try {
+      const { taskId } = req.params
+      const task = await Task.findById(taskId)
+      if(!task){ // sino existe lanza error y un status 404
+        const error = new Error('Tarea no encontrada')
+        res.status(404).json({error: error.message})
+        return
+      }
+      const { status } = req.body
+      task.status = status
+      await task.save()
+      res.send('Estado Actualizado')
     } catch (error) {
       res.status(500).json({error: 'Hubo un error :c'})
     }

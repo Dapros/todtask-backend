@@ -112,4 +112,12 @@ router.delete('/:projectId/tasks/:taskId',
   TaskController.deleteTask
 )
 
+// POST - CAMBIAR el estado de una tarea
+router.post('/:projectId/tasks/:taskId/status',
+  body('status')
+    .notEmpty().withMessage('El estado es obligatorio'),
+  handleInputErrors,
+  TaskController.updateStatus
+)
+
 export default router
