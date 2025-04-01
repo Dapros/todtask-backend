@@ -29,24 +29,16 @@ export class TaskController {
 
   static getTaskById = async (req: Request, res: Response) => {
     try {
-      const { taskId } = req.params // extrae taskId de los parametros del reques desde routes
-      const task = await Task.findById(taskId) // si encuentra por Id el mismo del parametro lo almacena en task
-      if(!task){ // sino existe lanza error y un status 404
-        const error = new Error('Tarea no encontrada')
-        res.status(404).json({error: error.message})
-        return
-      }
-
       // console.log(task.project.toString()) // muestra el id como objectId - se transforma a string con toString
       // console.log(req.project.id)
 
       // si la tarea no pertenece a un proyecto
-      if(task.project.toString() !== req.project.id){
+      if(req.task.project.toString() !== req.project.id){
         const error = new Error('Accion no valida')
         res.status(400).json({error: error.message})
         return
       }
-      res.json(task) // si existe lo devuelve como json
+      res.json(req.task) // si existe lo devuelve como json
     } catch (error) {
       res.status(500).json({error: 'Hubo un error :c'})
     }
@@ -54,23 +46,16 @@ export class TaskController {
 
   static updateTask = async (req: Request, res: Response) => {
     try {
-      const { taskId } = req.params // extrae taskId de los parametros del reques desde routes
-      const task = await Task.findById(taskId)
-      if(!task){ // sino existe lanza error y un status 404
-        const error = new Error('Tarea no encontrada')
-        res.status(404).json({error: error.message})
-        return
-      }
       // si la tarea no pertenece a un proyecto
-      if(task.project.toString() !== req.project.id){
+      if(req.task.project.toString() !== req.project.id){
         const error = new Error('Accion no valida')
         res.status(400).json({error: error.message})
         return
       }
 
-      task.name = req.body.name
-      task.description = req.body.description
-      await task.save()
+      req.task.name = req.body.name
+      req.task.description = req.body.description
+      await req.task.save()
 
       res.send('Tarea Actualizada Correctamente :D') 
     } catch (error) {
@@ -80,18 +65,11 @@ export class TaskController {
 
   static deleteTask = async (req: Request, res: Response) => {
     try {
-      const { taskId } = req.params // extrae taskId de los parametros del reques desde routes
-      const task = await Task.findById(taskId)
-      if(!task){ // sino existe lanza error y un status 404
-        const error = new Error('Tarea no encontrada')
-        res.status(404).json({error: error.message})
-        return
-      }
-      req.project.tasks = req.project.tasks.filter(task => task.toString() !== taskId) // filtrara lo que tiene el arreglo de project.task menos el taskId, es decir lo va a limpiar de la lista
+      req.project.tasks = req.project.tasks.filter(task => task.toString() !== req.task.id.toString()) // filtrara lo que tiene el arreglo de project.task menos el taskId, es decir lo va a limpiar de la lista
 
       // await task.deleteOne() // luego de encontrar id y pasar las validaciones lo eliminara con deleteOne
       // await req.project.save()
-      await Promise.allSettled([task.deleteOne(), req.project.save()]) // para evitar doble await
+      await Promise.allSettled([req.task.deleteOne(), req.project.save()]) // para evitar doble await
 
       res.send('Tarea ELIMINADA! Correctamente :D') 
     } catch (error) {
@@ -101,16 +79,9 @@ export class TaskController {
 
   static updateStatus = async (req: Request, res: Response) => {
     try {
-      const { taskId } = req.params
-      const task = await Task.findById(taskId)
-      if(!task){ // sino existe lanza error y un status 404
-        const error = new Error('Tarea no encontrada')
-        res.status(404).json({error: error.message})
-        return
-      }
       const { status } = req.body
-      task.status = status
-      await task.save()
+      req.task.status = status
+      await req.task.save()
       res.send('Estado Actualizado')
     } catch (error) {
       res.status(500).json({error: 'Hubo un error :c'})

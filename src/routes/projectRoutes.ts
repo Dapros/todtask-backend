@@ -3,7 +3,8 @@ import { body, param} from 'express-validator'
 import { ProjectController } from "../controllers/ProjectController";
 import { handleInputErrors } from "../middleware/validation";
 import { TaskController } from "../controllers/TaskController";
-import { validateProjectExists } from "../middleware/project";
+import { ProjectExists } from "../middleware/project";
+import { taskExists } from "../middleware/task";
 
 const router = Router()
 
@@ -59,7 +60,7 @@ router.delete('/:id',
 
 /** Rutas de las tareas - se hacen aqui porque dependen del proyecto */
 
-router.param('projectId', validateProjectExists) //parametros del router - donde encuentre el parametro projectId, se ejecutara la funcion validateProjectExists, antes que se genere cada router y evitar colocar el mismo middleware en todos los routes, se define como predefinido por asi decirlo
+router.param('projectId', ProjectExists) //parametros del router - donde encuentre el parametro projectId, se ejecutara la funcion validateProjectExists, antes que se genere cada router y evitar colocar el mismo middleware en todos los routes, se define como predefinido por asi decirlo
 
 // POST - Crear tareas
 router.post('/:projectId/tasks',
@@ -80,6 +81,9 @@ router.post('/:projectId/tasks',
 router.get('/:projectId/tasks',
   TaskController.getProjectTasks
 )
+
+// añadiendo middleware que valida 
+router.param('taskId', taskExists)
 
 // GET - Traer task unica por id
 router.get('/:projectId/tasks/:taskId',
