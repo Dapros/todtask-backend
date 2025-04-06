@@ -9,6 +9,13 @@ export class ProjectController {
 
     const project = new Project(req.body) // forma usando clase 
 
+    // === PARA PROBAR ERRORES - en la carpeta de api/ProjectAPI y pages/projects/CreateProhjectPage ===
+    // if(true){ 
+    //   const error = new Error('Proyecto no encontrado')
+    //   res.status(404).json({error: error.message})
+    //   return 
+    // }
+
     try {
       await project.save()
       // await Project.create(req.body) // forma mas simple genera el registro
